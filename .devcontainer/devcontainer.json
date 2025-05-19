@@ -1,22 +1,29 @@
 {
-  "name": "iExec Launchpad Dev Container",
+  "name": "iExec Arweave API",
   "build": {
     "dockerfile": "Dockerfile",
     "context": ".."
   },
+  "mounts": [
+    "type=bind,source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,readonly"
+  ],
   "features": {
     "ghcr.io/devcontainers/features/node:1": {
       "version": "lts"
     },
     "ghcr.io/devcontainers/features/docker-in-docker:1": {}
   },
-  "extensions": [
-    "esbenp.prettier-vscode",
-    "dbaeumer.vscode-eslint",
-    "vector-of-bool.commitlint"
-  ],
-  "settings": {
-    "terminal.integrated.shell.linux": "/bin/bash"
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.shell.linux": "/bin/bash"
+      },
+      "extensions": [
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint",
+        "vector-of-bool.commitlint"
+      ]
+    }
   },
   "postCreateCommand": "npm install",
   "remoteUser": "vscode"
