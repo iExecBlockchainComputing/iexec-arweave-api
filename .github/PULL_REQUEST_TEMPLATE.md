@@ -9,7 +9,6 @@ Closes #[issue-number] (e.g., `Closes #123`)
 ### ✏️ Changes
 
 - List the major changes or additions in bullet points.
--
 
 ### 🧪 How Has This Been Tested?
 
