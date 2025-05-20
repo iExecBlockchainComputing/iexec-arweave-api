@@ -13,7 +13,7 @@ export const uploadController = async (
     }
 
     const fileId = await handleFileUpload(req.file.buffer);
-    logger.info(`A new file has been added fileId=${fileId}`)
+    logger.info(`A new file has been added fileId=${fileId}`);
     res
       .status(200)
       .json({ arweaveId: fileId, url: `https://arweave.net/${fileId}` });
