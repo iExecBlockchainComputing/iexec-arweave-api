@@ -2,6 +2,7 @@ import cors from "cors";
 import express from "express";
 import { readFile } from "fs/promises";
 import { pino } from "pino";
+import uploadRoutes from './upload/upload.routes.js';
 
 const PORT = process.env.PORT || 3000;
 
@@ -22,6 +23,7 @@ const packageJson = JSON.parse(
 const app = express();
 
 app.use(cors(corsOptions));
+app.use('/upload', uploadRoutes);
 
 app.get("/health", (req, res) => {
   res.json({
