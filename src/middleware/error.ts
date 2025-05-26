@@ -1,5 +1,6 @@
 import type { NextFunction, Request, Response } from 'express';
 import { logger } from '../utils/logger.js';
+
 export function errorMiddleware(
   err: unknown,
   req: Request,

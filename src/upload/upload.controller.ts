@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { logger } from '../utils/logger.js';
 import { handleFileUpload } from './upload.service.js';
+
 export const uploadController = async (
   req: Request,
   res: Response,
