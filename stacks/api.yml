@@ -1,0 +1,20 @@
+services:
+  api:
+    image: ${REGISTRY:-ghcr.io}/iexec-arweave-api/iexec-arweave-api:latest
+    ports:
+      - "3000:3000"
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first
+    networks:
+      - api-network
+
+networks:
+  api-network:
+    driver: overlay

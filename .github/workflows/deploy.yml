@@ -1,0 +1,22 @@
+name: Deploy Docker Container
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on:
+      group: Azure_runners
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy
+        uses: kitconcept/docker-stack-deploy@v1.2.0
+        with:
+          remote_host: ${{ secrets.REMOTE_HOST }}
+          remote_user: ${{ secrets.REMOTE_USER }}
+          remote_private_key: ${{ secrets.REMOTE_PRIVATE_KEY }}
+          stack_file: "stacks/api.yml"
+          stack_name: "arweave-api"
