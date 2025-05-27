@@ -2,6 +2,7 @@ import cors from 'cors';
 import express from 'express';
 import { readFile } from 'fs/promises';
 import { pino } from 'pino';
+import { errorMiddleware } from './middleware/error.js';
 import uploadRoutes from './upload/upload.routes.js';
 
 const PORT = process.env.PORT || 3000;
@@ -37,6 +38,8 @@ app.get('/health', (req, res) => {
 app.get('/', (_, res) => {
   res.send('Arweave upload API is running 👋');
 });
+
+app.use(errorMiddleware);
 
 const server = app.listen(PORT, () => {
   rootLogger.info(`🚀 Server started at http://localhost:${PORT}`);
