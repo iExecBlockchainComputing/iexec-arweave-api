@@ -1,7 +1,6 @@
 import { TurboFactory } from '@ardrive/turbo-sdk';
 import Arweave from 'arweave';
 import { Readable } from 'stream';
-import { withTimeout } from '../utils/timeout.js';
 
 export const handleFileUpload = async (buffer: Buffer): Promise<string> => {
   const arweave = new Arweave({});
@@ -11,13 +10,12 @@ export const handleFileUpload = async (buffer: Buffer): Promise<string> => {
 
   const fileSize = buffer.length;
 
-  const uploadResult = await withTimeout(
+  const uploadResult = await 
     turbo.uploadFile({
       fileStreamFactory: () => Readable.from(buffer),
       fileSizeFactory: () => fileSize,
-    }),
-    15000 // 15 seconds
-  );
+       signal: AbortSignal.timeout(15_000),
+    });
 
   return uploadResult.id;
 };
