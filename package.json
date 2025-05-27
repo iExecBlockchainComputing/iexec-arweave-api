@@ -7,8 +7,10 @@
     "dev": "tsx --env-file=.env --watch ./src/index.js",
     "dev:pretty": "tsx --env-file=.env --watch ./src/index.js | pino-pretty -tc",
     "check-types": "tsc --project tsconfig.json",
-    "format": "prettier --write .",
-    "lint": "eslint src",
+    "format": "prettier --write \"(src|tests)/**/*.ts\"",
+    "check-format": "prettier --check \"(src|tests)/**/*.ts\"",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "test": "vitest run"
   },
   "keywords": [],
