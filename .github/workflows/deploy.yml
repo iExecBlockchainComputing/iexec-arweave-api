@@ -2,8 +2,11 @@ name: Deploy Docker Container
 
 on:
   push:
-    branches: [main]
   workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   deploy:
@@ -12,11 +15,30 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          auth-type: 'IDENTITY'
+          tenant-id: ${{ secrets.AZURE_MCA_TENANT_ID }}
+          allow-no-subscriptions: true
+
+      - name: Get SSH key from Azure Key Vault
+        uses: azure/cli@v2
+        with:
+          azcliversion: latest
+          inlineScript: |
+            SSH_KEY=$(az keyvault secret show --vault-name kv-iexec-github-actions --name githubactionsrunners-sshkey --query value -o tsv)
+
+            echo "::add-mask::$SSH_KEY"
+            echo "SSH_KEY<<EOF" >> $GITHUB_ENV
+            echo "$SSH_KEY" >> $GITHUB_ENV
+            echo "EOF" >> $GITHUB_ENV
+
       - name: Deploy
         uses: kitconcept/docker-stack-deploy@v1.2.0
         with:
           remote_host: ${{ secrets.REMOTE_HOST }}
           remote_user: ${{ secrets.REMOTE_USER }}
-          remote_private_key: ${{ secrets.REMOTE_PRIVATE_KEY }}
+          remote_private_key: ${{ env.SSH_KEY }}
           stack_file: "stacks/api.yml"
           stack_name: "arweave-api"
