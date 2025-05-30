@@ -18,28 +18,35 @@ jobs:
       - name: Azure login
         uses: azure/login@v2
         with:
-          auth-type: 'IDENTITY'
+          auth-type: IDENTITY
           tenant-id: ${{ secrets.AZURE_MCA_TENANT_ID }}
           allow-no-subscriptions: true
 
-      - name: Get SSH key from Azure Key Vault
-        id: get-secret
+      - name: Get SSH key and write to file
         uses: azure/cli@v2
         with:
           azcliversion: latest
           inlineScript: |
-            SSH_KEY=$(az keyvault secret show --vault-name kv-iexec-github-actions --name githubactionsrunners-sshkey --query value -o tsv)
+            set -euo pipefail
 
-            echo "::add-mask::$SSH_KEY"
-            echo "SSH_KEY<<EOF" >> $GITHUB_ENV
-            echo "$SSH_KEY" >> $GITHUB_ENV
-            echo "EOF" >> $GITHUB_ENV
+            RAW_KEY=$(az keyvault secret show \
+              --vault-name kv-iexec-github-actions \
+              --name githubactionsrunners-sshkey \
+              --query value -o tsv)
 
-      - name: Deploy
+            KEY_B64=$(printf '%s' "$RAW_KEY" | base64 -w0)
+
+            echo "::add-mask::$KEY_B64"
+
+            printf '%s' "$KEY_B64" | base64 -d > ~/.ssh/id_rsa
+            chmod 600 ~/.ssh/id_rsa
+
+      - name: Deploy Docker Stack
         uses: kitconcept/docker-stack-deploy@v1.2.0
         with:
-          remote_host: ${{ secrets.REMOTE_HOST }}
-          remote_user: ${{ secrets.REMOTE_USER }}
-          remote_private_key: ${{ env.SSH_KEY }}
-          stack_file: "stacks/api.yml"
-          stack_name: "arweave-api"
+          remote_host:       ${{ secrets.REMOTE_HOST }}
+          remote_user:       ${{ secrets.REMOTE_USER }}
+          remote_private_key: |
+            ${{ (cat ~/.ssh/id_rsa) }}
+          stack_file:        stacks/api.yml
+          stack_name:        arweave-api
