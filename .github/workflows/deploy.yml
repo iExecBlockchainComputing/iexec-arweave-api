@@ -1,7 +1,8 @@
 name: Deploy Docker Container
 
-
-on: [push, workflow_dispatch]
+on:
+  push:
+  workflow_dispatch:
 
 permissions:
   id-token: write
@@ -27,19 +28,21 @@ jobs:
         with:
           azcliversion: latest
           inlineScript: |
-            set -euo pipefail
-            SECRET=$(az keyvault secret show \
+            SSH_KEY=$(az keyvault secret show \
               --vault-name kv-iexec-github-actions \
               --name StorageAccountKey \
               --query value -o tsv)
-            echo "::add-mask::$SECRET"
-            echo "secret_value=$SECRET" >> $GITHUB_OUTPUT
+
+            echo "::add-mask::$SSH_KEY"
+            echo "SSH_KEY<<EOF" >> $GITHUB_ENV
+            echo "$SSH_KEY" >> $GITHUB_ENV
+            echo "EOF" >> $GITHUB_ENV
 
       - name: Deploy
         uses: kitconcept/docker-stack-deploy@v1.2.0
         with:
           remote_host: ${{ secrets.REMOTE_HOST }}
           remote_user: ${{ secrets.REMOTE_USER }}
-          remote_private_key: ${{ steps.get-secret.outputs.secret_value }}
-          stack_file: stacks/api.yml
-          stack_name: arweave-api
+          remote_private_key: ${{ env.SSH_KEY }}
+          stack_file: "stacks/api.yml"
+          stack_name: "arweave-api"
