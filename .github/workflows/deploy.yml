@@ -28,10 +28,7 @@ jobs:
         with:
           azcliversion: latest
           inlineScript: |
-            SSH_KEY=$(az keyvault secret show \
-              --vault-name kv-iexec-github-actions \
-              --name StorageAccountKey \
-              --query value -o tsv)
+            SSH_KEY=$(az keyvault secret show --vault-name kv-iexec-github-actions --name githubactionsrunners-sshkey --query value -o tsv)
 
             echo "::add-mask::$SSH_KEY"
             echo "SSH_KEY<<EOF" >> $GITHUB_ENV
