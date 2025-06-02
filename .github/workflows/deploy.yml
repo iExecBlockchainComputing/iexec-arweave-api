@@ -35,13 +35,11 @@ jobs:
               --name githubactionsrunners-sshkey \
               --query value -o tsv)
 
-            KEY_B64=$(printf '%s' "$RAW_KEY" | base64 -w0)
+            echo "::add-mask::$RAW_KEY"
 
-            echo "::add-mask::$KEY_B64"
-
-            echo "SSH_KEY<<EOF" >> $GITHUB_ENV
-            printf '%s' "$KEY_B64" | base64 -d >> $GITHUB_ENV
-            echo "EOF" >> $GITHUB_ENV
+            echo "SSH_KEY<<GITHUB_ENV_DELIMITER_12345" >> $GITHUB_ENV
+            printf '%s' "$RAW_KEY" >> $GITHUB_ENV
+            echo "GITHUB_ENV_DELIMITER_12345" >> $GITHUB_ENV
 
       - name: Deploy Docker Stack
         uses: kitconcept/docker-stack-deploy@v1.2.0
