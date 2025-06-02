@@ -3,6 +3,8 @@ import express from 'express';
 import { readFile } from 'fs/promises';
 import { pino } from 'pino';
 import { errorMiddleware } from './middleware/error.js';
+import { loggerMiddleware } from './middleware/logger.js';
+import { notFoundMiddleware } from './middleware/not-found.js';
 import uploadRoutes from './upload/upload.routes.js';
 
 const PORT = process.env.PORT || 3000;
@@ -23,6 +25,9 @@ const packageJson = JSON.parse(
 
 const app = express();
 
+if (rootLogger.level === 'debug') {
+  app.use(loggerMiddleware);
+}
 app.use(cors(corsOptions));
 app.use('/upload', uploadRoutes);
 
@@ -40,6 +45,7 @@ app.get('/', (_, res) => {
 });
 
 app.use(errorMiddleware);
+app.use(notFoundMiddleware);
 
 const server = app.listen(PORT, () => {
   rootLogger.info(`🚀 Server started at http://localhost:${PORT}`);
