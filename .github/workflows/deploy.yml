@@ -22,7 +22,8 @@ jobs:
           tenant-id: ${{ secrets.AZURE_MCA_TENANT_ID }}
           allow-no-subscriptions: true
 
-      - name: Get SSH key and write to file
+      - name: Get SSH key from Azure Key Vault and set env var
+        id: fetch-secret
         uses: azure/cli@v2
         with:
           azcliversion: latest
@@ -38,15 +39,15 @@ jobs:
 
             echo "::add-mask::$KEY_B64"
 
-            printf '%s' "$KEY_B64" | base64 -d > ~/.ssh/id_rsa
-            chmod 600 ~/.ssh/id_rsa
+            echo "SSH_KEY<<EOF" >> $GITHUB_ENV
+            printf '%s' "$KEY_B64" | base64 -d >> $GITHUB_ENV
+            echo "EOF" >> $GITHUB_ENV
 
       - name: Deploy Docker Stack
         uses: kitconcept/docker-stack-deploy@v1.2.0
         with:
           remote_host:       ${{ secrets.REMOTE_HOST }}
           remote_user:       ${{ secrets.REMOTE_USER }}
-          remote_private_key: |
-            ${{ (cat ~/.ssh/id_rsa) }}
+          remote_private_key: ${{ env.SSH_KEY }}
           stack_file:        stacks/api.yml
           stack_name:        arweave-api
