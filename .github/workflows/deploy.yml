@@ -46,8 +46,8 @@ jobs:
       - name: Deploy Docker Stack
         uses: kitconcept/docker-stack-deploy@v1.2.0
         with:
-          remote_host:       ${{ secrets.REMOTE_HOST }}
-          remote_user:       ${{ secrets.REMOTE_USER }}
+          remote_host: ${{ secrets.REMOTE_HOST }}
+          remote_user: ${{ secrets.REMOTE_USER }}
           remote_private_key: ${{ env.SSH_KEY }}
-          stack_file:        stacks/api.yml
-          stack_name:        arweave-api
+          stack_file: stacks/api.yml
+          stack_name: arweave-api
