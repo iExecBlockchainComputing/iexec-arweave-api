@@ -38,8 +38,8 @@ jobs:
             echo "::add-mask::$RAW_KEY"
 
             echo "SSH_KEY<<GITHUB_ENV_DELIMITER_12345" >> $GITHUB_ENV
-            printf '%s' "$RAW_KEY" >> $GITHUB_ENV
-            echo "GITHUB_ENV_DELIMITER_12345" >> $GITHUB_ENV
+            echo "$RAW_KEY"                     >> $GITHUB_ENV
+            echo "GITHUB_ENV_DELIMITER_12345"   >> $GITHUB_ENV
 
       - name: Deploy Docker Stack
         uses: kitconcept/docker-stack-deploy@v1.2.0
