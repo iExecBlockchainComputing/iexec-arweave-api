@@ -41,11 +41,29 @@ jobs:
             echo "$RAW_KEY"                     >> $GITHUB_ENV
             echo "GITHUB_ENV_DELIMITER_12345"   >> $GITHUB_ENV
 
-      - name: Deploy Docker Stack
-        uses: kitconcept/docker-stack-deploy@v1.2.0
+      - name: Setup SSH agent
+        uses: webfactory/ssh-agent@v0.7.0
         with:
-          remote_host: ${{ secrets.REMOTE_HOST }}
-          remote_user: ${{ secrets.REMOTE_USER }}
-          remote_private_key: ${{ env.SSH_KEY }}
-          stack_file: stacks/api.yml
-          stack_name: arweave-api
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Ensure known hosts
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
+
+      - name: Copy docker-compose.yml to remote server
+        uses: appleboy/scp-action@v0.1.6
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "docker-compose.yml"
+          target: "~/deploy/" # Check the path
+
+      - name: Run Docker Compose on remote server
+        run: |
+          ssh -o StrictHostKeyChecking=no "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" << 'EOF'
+            cd ~/deploy  # Check the path
+            docker compose pull
+            docker compose up -d
+          EOF
