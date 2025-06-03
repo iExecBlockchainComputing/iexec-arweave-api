@@ -70,6 +70,26 @@ npm run format
 npm run lint
 ```
 
+### 🎉 Sample
+
+Start API
+```sh
+npm run dev
+```
+
+In other terminal
+
+```sh
+echo "Try to add a file to arweave" > demo.txt
+curl -X POST http://localhost:3000/upload -F "file=@demo.txt" | jq
+
+{
+  "arweaveId": "n-JSY0BRWyVWIKsav8JuPUZymwFZArRhBlqHKlcfmqs",
+  "url": "https://arweave.net/n-JSY0BRWyVWIKsav8JuPUZymwFZArRhBlqHKlcfmqs"
+}
+
+```
+
 ### 🩺 Health checks
 
 A health endpoint (`/health`) is enabled by default
