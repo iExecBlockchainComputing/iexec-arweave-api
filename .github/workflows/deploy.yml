@@ -9,23 +9,24 @@ permissions:
   contents: read
 
 jobs:
+  build:
+    uses: iExecBlockchainComputing/github-actions-workflows/docker-build.yml@docker-build-v2.2.0
+    with:
+      dockerfile: 'Dockerfile'
+      # With tag
+      image-tag: 'arweave-api:${{ github.sha }}'
+      hadolint: false
+      security-scan: false
+      push: true
+      registry: 'regis.iex.ec'
+    secrets:
+      username: ${{ secrets.regis_user }}
+      password: ${{ secrets.regis_password }}
   deploy:
     runs-on:
       group: Azure_runners
+    need: build
     steps:
-      uses: iExecBlockchainComputing/github-actions-workflows/docker-build.yml@docker-build-v2.2.0
-      with:
-        dockerfile: 'Dockerfile'
-        # With tag
-        image-tag: 'arweave-api:${{ github.sha }}'
-        hadolint: false
-        security-scan: false
-        push: true
-        registry: 'regis.iex.ec'
-      secrets:
-        username: ${{ secrets.regis_user }}
-        password: ${{ secrets.regis_password }}
-
       - name: Azure login
         uses: azure/login@v2
         with:
