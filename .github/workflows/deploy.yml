@@ -28,23 +28,37 @@ jobs:
       group: Azure_runners
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
       - name: Setup ~/.ssh folder
         run: |
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
+
+      - name: Link existing runner SSH key
+        if: ${{ !exists('~/.ssh/id_rsa') }}
+        run: |
+          ln -s /path/to/runner/id_rsa ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
       - name: Add remote host to known_hosts
         run: |
           ssh-keyscan azubdocxp-team-product.public.az2.internal >> ~/.ssh/known_hosts
           chmod 644 ~/.ssh/known_hosts
+
       - name: Copy docker-compose.yml to remote server
         uses: appleboy/scp-action@v0.1.6
         with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
+          host: azubdocxp-team-product.public.az2.internal
+          username: ghrunnerci
           key_path: ~/.ssh/id_rsa
           port: 22
           source: "docker-compose.yml"
           target: "~/deploy/"
+          timeout: 30s
+          command_timeout: 10m
+
       - name: Run Docker Compose on remote server
         run: |
           ssh -o StrictHostKeyChecking=no \
