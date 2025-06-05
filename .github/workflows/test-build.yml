@@ -9,3 +9,4 @@ jobs:
       dockerfile: 'Dockerfile'
       image-name: 'arweave-api'
       image-tag: ${{ github.sha }}
+      security-report: 'comment'
