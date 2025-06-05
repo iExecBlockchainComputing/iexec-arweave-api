@@ -21,8 +21,8 @@ jobs:
       push: true
       registry: 'regis.iex.ec'
     secrets:
-      username: ${{ secrets.regis_user }}
-      password: ${{ secrets.regis_password }}
+      username: ${{ secrets.NEXUS_USERNAME }}
+      password: ${{ secrets.NEXUS_PASSWORD }}
   deploy:
     runs-on:
       group: Azure_runners
