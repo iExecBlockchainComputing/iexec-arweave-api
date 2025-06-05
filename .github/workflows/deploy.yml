@@ -24,7 +24,6 @@ jobs:
 #       username: ${{ secrets.NEXUS_USERNAME }}
 #       password: ${{ secrets.NEXUS_PASSWORD }}
   deploy:
- deploy:
     runs-on:
       group: Azure_runners
 
