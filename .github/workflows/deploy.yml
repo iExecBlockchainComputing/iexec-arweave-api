@@ -26,7 +26,7 @@ jobs:
   deploy:
     runs-on:
       group: Azure_runners
-    needs: build
+    # needs: build
     steps:
 
       - name: Setup SSH agent
