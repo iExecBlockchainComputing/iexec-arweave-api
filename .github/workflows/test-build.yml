@@ -1,0 +1,14 @@
+name: Test Build Docker Container
+
+on: [pull_request]
+
+jobs:
+  deploy:
+    runs-on:
+      group: Azure_runners
+    steps:
+      uses: iExecBlockchainComputing/github-actions-workflows/docker-build.yml@docker-build-v2.2.0
+      with:
+        dockerfile: 'Dockerfile'
+        image-name: 'arweave-api'
+        image-tag: ${{ github.sha }}
