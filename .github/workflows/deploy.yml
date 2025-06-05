@@ -19,7 +19,7 @@ jobs:
       hadolint: false
       security-scan: false
       push: true
-      registry: 'regis.iex.ec'
+      registry: 'docker-regis.iex.ec/arweave-api'
     secrets:
       username: ${{ secrets.NEXUS_USERNAME }}
       password: ${{ secrets.NEXUS_PASSWORD }}
