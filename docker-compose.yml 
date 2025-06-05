@@ -3,8 +3,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: iapp-api
-    container_name: iapp-api
+    image: arweave-api
+    container_name: arweave-api
     ports:
       - '3000:3000'
     volumes:
