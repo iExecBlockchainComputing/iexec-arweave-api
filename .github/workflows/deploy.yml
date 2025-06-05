@@ -24,27 +24,34 @@ jobs:
 #       username: ${{ secrets.NEXUS_USERNAME }}
 #       password: ${{ secrets.NEXUS_PASSWORD }}
   deploy:
+ deploy:
     runs-on:
       group: Azure_runners
-    # needs: build
-    steps:
-      - name: Ensure known hosts
-        run: |
-          echo "${{ secrets.SSH_KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
 
+    steps:
+      - name: Setup ~/.ssh folder
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+      - name: Add remote host to known_hosts
+        run: |
+          ssh-keyscan azubdocxp-team-product.public.az2.internal >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
       - name: Copy docker-compose.yml to remote server
         uses: appleboy/scp-action@v0.1.6
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          key_path: ~/.ssh/id_rsa
+          port: 22
           source: "docker-compose.yml"
-          target: "~/deploy/" # Check the path
-
+          target: "~/deploy/"
       - name: Run Docker Compose on remote server
         run: |
-          ssh -o StrictHostKeyChecking=no "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" << 'EOF'
-            cd ~/deploy  # Check the path
+          ssh -o StrictHostKeyChecking=no \
+              -i ~/.ssh/id_rsa \
+              ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+            cd ~/deploy
             docker compose pull
             docker compose up -d
           EOF
