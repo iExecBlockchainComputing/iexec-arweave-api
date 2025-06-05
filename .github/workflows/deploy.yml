@@ -9,50 +9,25 @@ permissions:
   contents: read
 
 jobs:
-  build:
-    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/docker-build.yml@docker-build-v2.2.0
-    with:
-      dockerfile: 'Dockerfile'
-      # With tag
-      image-name: 'arweave-api'
-      image-tag: ${{ github.sha }}
-      hadolint: false
-      security-scan: false
-      push: true
-      registry: 'docker-regis.iex.ec/arweave-api'
-    secrets:
-      username: ${{ secrets.NEXUS_USERNAME }}
-      password: ${{ secrets.NEXUS_PASSWORD }}
+#   build:
+#     uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/docker-build.yml@docker-build-v2.2.0
+#     with:
+#       dockerfile: 'Dockerfile'
+#       # With tag
+#       image-name: 'arweave-api'
+#       image-tag: ${{ github.sha }}
+#       hadolint: false
+#       security-scan: false
+#       push: true
+#       registry: 'docker-regis.iex.ec/arweave-api'
+#     secrets:
+#       username: ${{ secrets.NEXUS_USERNAME }}
+#       password: ${{ secrets.NEXUS_PASSWORD }}
   deploy:
     runs-on:
       group: Azure_runners
     needs: build
     steps:
-      - name: Azure login
-        uses: azure/login@v2
-        with:
-          auth-type: IDENTITY
-          tenant-id: ${{ secrets.AZURE_MCA_TENANT_ID }}
-          allow-no-subscriptions: true
-
-      - name: Get SSH key from Azure Key Vault and set env var
-        id: fetch-secret
-        uses: azure/cli@v2
-        with:
-          azcliversion: latest
-          inlineScript: |
-            set -euo pipefail
-
-            RAW_KEY=$(az keyvault secret show \
-              --vault-name kv-iexec-github-actions \
-              --name githubactionsrunners-sshkey \
-              --query value -o tsv)
-
-            echo "::add-mask::$RAW_KEY"
-
-            echo "SSH_KEY<<GITHUB_ENV_DELIMITER_12345" >> $GITHUB_ENV
-            echo "$RAW_KEY"                     >> $GITHUB_ENV
-            echo "GITHUB_ENV_DELIMITER_12345"   >> $GITHUB_ENV
 
       - name: Setup SSH agent
         uses: webfactory/ssh-agent@v0.7.0
