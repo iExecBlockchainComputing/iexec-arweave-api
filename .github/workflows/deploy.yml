@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   build:
-    uses: iExecBlockchainComputing/github-actions-workflows/docker-build.yml@docker-build-v2.2.0
+    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/docker-build.yml@docker-build-v2.2.0
     with:
       dockerfile: 'Dockerfile'
       # With tag
