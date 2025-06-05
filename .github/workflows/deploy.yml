@@ -14,7 +14,8 @@ jobs:
     with:
       dockerfile: 'Dockerfile'
       # With tag
-      image-tag: 'arweave-api:${{ github.sha }}'
+      image-name: 'arweave-api'
+      image-tag: ${{ github.sha }}
       hadolint: false
       security-scan: false
       push: true
