@@ -41,6 +41,12 @@ jobs:
           ssh-keyscan azubdocxp-team-product.public.az2.internal >> ~/.ssh/known_hosts
           chmod 644 ~/.ssh/known_hosts
 
+      - name: Create remote deploy folder if missing
+        run: |
+          ssh -o StrictHostKeyChecking=no \
+              -i ~/.ssh/id_rsa \
+              ghrunnerci@azubdocxp-team-product.public.az2.internal "mkdir -p ~/deploy"
+
       - name: Copy docker-compose.yml to remote server
         uses: appleboy/scp-action@v0.1.6
         with:
@@ -57,7 +63,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no \
               -i ~/.ssh/id_rsa \
-              ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+              ghrunnerci@azubdocxp-team-product.public.az2.internal << 'EOF'
             cd ~/deploy
             docker compose pull
             docker compose up -d
