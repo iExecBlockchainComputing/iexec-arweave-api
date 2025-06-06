@@ -53,6 +53,13 @@ jobs:
             exit 1
           fi
 
+      - name: Load SSH key into ~/.ssh
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/ghrunnerci
+          chmod 600 ~/.ssh/ghrunnerci
+        shell: bash
+
       - name: Copy docker-compose.yml to remote server
         uses: appleboy/scp-action@v1
         with:
