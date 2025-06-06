@@ -52,7 +52,7 @@ jobs:
               ghrunnerci@azubdocxp-team-product.public.az2.internal "mkdir -p /opt/arweave-api"
 
       - name: Copy docker-compose.yml to remote server
-        uses: appleboy/scp-action@v0.1.6
+        uses: appleboy/scp-action@v1.0.0
         with:
           host: azubdocxp-team-product.public.az2.internal
           username: ghrunnerci
