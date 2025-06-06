@@ -6,4 +6,5 @@ on:
 
 jobs:
   stale:
+    runs-on: ubuntu-latest
     uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/stale.yml@stale-v1.0.0

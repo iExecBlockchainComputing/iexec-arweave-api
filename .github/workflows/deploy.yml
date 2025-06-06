@@ -1,0 +1,75 @@
+name: Deploy Docker Container
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build:
+    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/docker-build.yml@docker-build-v2.2.0
+    with:
+      dockerfile: 'Dockerfile'
+      image-name: 'iexechub/arweave-api'
+      image-tag: ${{ github.sha }}
+      hadolint: false
+      security-scan: false
+      push: true
+    secrets:
+      username: ${{ secrets.DOCKERHUB_USERNAME }}
+      password: ${{ secrets.DOCKERHUB_PAT }}
+  deploy:
+    runs-on:
+      group: Azure_runners
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify SSH key exists on runner
+        run: |
+          if [ ! -f ~/.ssh/ghrunnerci ]; then
+            echo "SSH key not found at ~/.ssh/ghrunnerci on the runner"
+            exit 1
+          fi
+          chmod 600 ~/.ssh/ghrunnerci
+        shell: bash
+
+      - name: Add remote host to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan azubdocxp-team-product.public.az2.internal >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+        shell: bash
+
+      - name: Check for docker-compose.yml in workspace
+        run: |
+          if [ ! -f ./docker-compose.yml ]; then
+            echo "docker-compose.yml not found in the repository"
+            exit 1
+          fi
+        shell: bash
+
+      - name: Copy docker-compose.yml to remote server via scp
+        run: |
+          scp -o StrictHostKeyChecking=no \
+              -i ~/.ssh/ghrunnerci \
+              ./docker-compose.yml \
+              azubdocxp-team-product.public.az2.internal:/opt/arweave-api/
+        shell: bash
+
+      - name: Run Docker Compose on remote server
+        run: |
+          ssh -o StrictHostKeyChecking=no \
+              -i ~/.ssh/ghrunnerci \
+              azubdocxp-team-product.public.az2.internal << 'EOF'
+            cd /opt/arweave-api
+            docker compose pull
+            docker compose up -d
+          EOF
+        shell: bash
