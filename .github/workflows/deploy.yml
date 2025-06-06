@@ -36,6 +36,7 @@ jobs:
 
       - name: Ensure SSH private key permissions
         run: |
+          ls -la ~/.ssh
           chmod 600 ~/.ssh/id_rsa
 
       - name: Add remote host to known_hosts
@@ -69,4 +70,3 @@ jobs:
             cd /opt/arweave-api
             docker compose pull
             docker compose up -d
-          EOF
