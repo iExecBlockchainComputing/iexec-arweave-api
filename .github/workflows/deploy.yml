@@ -27,7 +27,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Check if SSH key exists
         run: |
@@ -61,6 +61,7 @@ jobs:
           source: "docker-compose.yml"
           target: "/opt/arweave-api"
           timeout: 30s
+          debug: true
           command_timeout: 10m
 
       - name: Run Docker Compose on remote server
