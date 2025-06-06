@@ -34,6 +34,10 @@ jobs:
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
 
+      - name: Ensure SSH private key permissions
+        run: |
+          chmod 600 ~/.ssh/id_rsa
+
       - name: Add remote host to known_hosts
         run: |
           ssh-keyscan azubdocxp-team-product.public.az2.internal >> ~/.ssh/known_hosts
