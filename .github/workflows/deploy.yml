@@ -43,7 +43,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no \
               -i ~/.ssh/id_rsa \
-              ghrunnerci@azubdocxp-team-product.public.az2.internal "mkdir -p ~/deploy"
+              ghrunnerci@azubdocxp-team-product.public.az2.internal "mkdir -p /opt/arweave-api"
 
       - name: Copy docker-compose.yml to remote server
         uses: appleboy/scp-action@v0.1.6
@@ -53,7 +53,7 @@ jobs:
           key_path: ~/.ssh/id_rsa
           port: 22
           source: "docker-compose.yml"
-          target: "~/deploy/"
+          target: "/opt/arweave-api"
           timeout: 30s
           command_timeout: 10m
 
@@ -62,7 +62,7 @@ jobs:
           ssh -o StrictHostKeyChecking=no \
               -i ~/.ssh/id_rsa \
               ghrunnerci@azubdocxp-team-product.public.az2.internal << 'EOF'
-            cd ~/deploy
+            cd /opt/arweave-api
             docker compose pull
             docker compose up -d
           EOF
