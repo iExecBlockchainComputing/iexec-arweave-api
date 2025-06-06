@@ -13,7 +13,7 @@ jobs:
     uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/docker-build.yml@docker-build-v2.2.0
     with:
       dockerfile: 'Dockerfile'
-      image-name: 'iexechub/iexec-arweave-api'
+      image-name: 'iexechub/arweave-api'
       image-tag: ${{ github.sha }}
       hadolint: false
       security-scan: false
