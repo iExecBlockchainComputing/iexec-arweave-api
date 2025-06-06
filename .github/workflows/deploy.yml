@@ -44,6 +44,7 @@ jobs:
           mkdir -p ~/.ssh
           ssh-keyscan azubdocxp-team-product.public.az2.internal >> ~/.ssh/known_hosts
           chmod 644 ~/.ssh/known_hosts
+        shell: bash
 
       - name: Check if docker-compose.yml exists
         run: |
