@@ -28,16 +28,17 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Check if SSH key exists
+      - name: Verify SSH key exists on runner
         run: |
           if [ ! -f ~/.ssh/ghrunnerci ]; then
-            echo "SSH key not found at ~/.ssh/ghrunnerci"
+            echo "SSH key not found at ~/.ssh/ghrunnerci on the runner"
             exit 1
           fi
-
-      - name: Set permissions on existing SSH key
-        run: chmod 600 ~/.ssh/ghrunnerci
+          chmod 600 ~/.ssh/ghrunnerci
+        shell: bash
 
       - name: Add remote host to known_hosts
         run: |
@@ -46,32 +47,21 @@ jobs:
           chmod 644 ~/.ssh/known_hosts
         shell: bash
 
-      - name: Check if docker-compose.yml exists
+      - name: Check for docker-compose.yml in workspace
         run: |
-          if [ ! -f docker-compose.yml ]; then
+          if [ ! -f ./docker-compose.yml ]; then
             echo "docker-compose.yml not found in the repository"
             exit 1
           fi
-
-      - name: Load SSH key into ~/.ssh
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/ghrunnerci
-          chmod 600 ~/.ssh/ghrunnerci
         shell: bash
 
-      - name: Copy docker-compose.yml to remote server
-        uses: appleboy/scp-action@v1
-        with:
-          host: azubdocxp-team-product.public.az2.internal
-          username: ghrunnerci
-          key_path: ~/.ssh/ghrunnerci
-          port: 22
-          source: "./docker-compose.yml"
-          target: "/opt/arweave-api"
-          timeout: 30s
-          debug: true
-          command_timeout: 10m
+      - name: Copy docker-compose.yml to remote server via scp
+        run: |
+          scp -o StrictHostKeyChecking=no \
+              -i ~/.ssh/ghrunnerci \
+              ./docker-compose.yml \
+              ghrunnerci@azubdocxp-team-product.public.az2.internal:/opt/arweave-api/
+        shell: bash
 
       - name: Run Docker Compose on remote server
         run: |
@@ -82,3 +72,4 @@ jobs:
             docker compose pull
             docker compose up -d
           EOF
+        shell: bash
