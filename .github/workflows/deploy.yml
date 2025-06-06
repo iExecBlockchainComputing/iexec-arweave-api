@@ -29,25 +29,26 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Setup ~/.ssh folder
+      - name: Check if SSH key exists
         run: |
-          mkdir -p ~/.ssh
-          chmod 700 ~/.ssh
+          if [ ! -f ~/.ssh/ghrunnerci ]; then
+            echo "SSH key not found at ~/.ssh/ghrunnerci"
+            exit 1
+          fi
 
-      - name: Ensure SSH private key permissions
-        run: |
-          ls -la ~/.ssh
-          chmod 600 ~/.ssh/id_rsa
+      - name: Set permissions on existing SSH key
+        run: chmod 600 ~/.ssh/ghrunnerci
 
       - name: Add remote host to known_hosts
         run: |
+          mkdir -p ~/.ssh
           ssh-keyscan azubdocxp-team-product.public.az2.internal >> ~/.ssh/known_hosts
           chmod 644 ~/.ssh/known_hosts
 
       - name: Create remote deploy folder if missing
         run: |
           ssh -o StrictHostKeyChecking=no \
-              -i ~/.ssh/id_rsa \
+              -i ~/.ssh/ghrunnerci \
               ghrunnerci@azubdocxp-team-product.public.az2.internal "mkdir -p /opt/arweave-api"
 
       - name: Copy docker-compose.yml to remote server
@@ -55,7 +56,7 @@ jobs:
         with:
           host: azubdocxp-team-product.public.az2.internal
           username: ghrunnerci
-          key_path: ~/.ssh/id_rsa
+          key_path: ~/.ssh/ghrunnerci
           port: 22
           source: "docker-compose.yml"
           target: "/opt/arweave-api"
@@ -65,8 +66,9 @@ jobs:
       - name: Run Docker Compose on remote server
         run: |
           ssh -o StrictHostKeyChecking=no \
-              -i ~/.ssh/id_rsa \
+              -i ~/.ssh/ghrunnerci \
               ghrunnerci@azubdocxp-team-product.public.az2.internal << 'EOF'
             cd /opt/arweave-api
             docker compose pull
             docker compose up -d
+          EOF
