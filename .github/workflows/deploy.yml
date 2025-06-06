@@ -60,14 +60,14 @@ jobs:
           scp -o StrictHostKeyChecking=no \
               -i ~/.ssh/ghrunnerci \
               ./docker-compose.yml \
-              ghrunnerci@azubdocxp-team-product.public.az2.internal:/opt/arweave-api/
+              azubdocxp-team-product.public.az2.internal:/opt/arweave-api/
         shell: bash
 
       - name: Run Docker Compose on remote server
         run: |
           ssh -o StrictHostKeyChecking=no \
               -i ~/.ssh/ghrunnerci \
-              ghrunnerci@azubdocxp-team-product.public.az2.internal << 'EOF'
+              azubdocxp-team-product.public.az2.internal << 'EOF'
             cd /opt/arweave-api
             docker compose pull
             docker compose up -d
