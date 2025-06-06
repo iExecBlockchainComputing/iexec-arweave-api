@@ -45,11 +45,12 @@ jobs:
           ssh-keyscan azubdocxp-team-product.public.az2.internal >> ~/.ssh/known_hosts
           chmod 644 ~/.ssh/known_hosts
 
-      - name: Create remote deploy folder if missing
+      - name: Check if docker-compose.yml exists
         run: |
-          ssh -o StrictHostKeyChecking=no \
-              -i ~/.ssh/ghrunnerci \
-              ghrunnerci@azubdocxp-team-product.public.az2.internal "mkdir -p /opt/arweave-api"
+          if [ ! -f docker-compose.yml ]; then
+            echo "docker-compose.yml not found in the repository"
+            exit 1
+          fi
 
       - name: Copy docker-compose.yml to remote server
         uses: appleboy/scp-action@v1
