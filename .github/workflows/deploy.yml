@@ -26,6 +26,10 @@ jobs:
     runs-on:
       group: Azure_runners
 
+    env:
+      IMAGE_NAME: iexechub/arweave-api
+      IMAGE_TAG:  ${{ github.sha }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
