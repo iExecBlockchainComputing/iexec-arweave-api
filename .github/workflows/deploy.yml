@@ -24,6 +24,7 @@ jobs:
   deploy:
     runs-on:
       group: Azure_runners
+      needs: [build]
 
     steps:
       - name: Checkout repository
