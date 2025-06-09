@@ -56,7 +56,7 @@ jobs:
 
       - name: Prepare .env for Compose
         run: |
-          printf "IMAGE_NAME=%s\nIMAGE_TAG=%s\n" "$IMAGE_NAME" "$IMAGE_TAG" > .env
+          printf "IMAGE_NAME=%s\nIMAGE_TAG=%s\nDOCKERHUB_USERNAME=%s\nDOCKERHUB_PASSWORD=%s\n" "$IMAGE_NAME" "$IMAGE_TAG" "$DOCKERHUB_USERNAME" "$DOCKERHUB_PASSWORD"> .env
         shell: bash
 
       - name: Check for docker-compose.yml in workspace
@@ -82,12 +82,10 @@ jobs:
               azubdocxp-team-product.public.az2.internal << 'EOF'
             cd /opt/arweave-api
 
-            export DOCKERHUB_USERNAME="${DOCKERHUB_USERNAME}"
-            export DOCKERHUB_PAT="${DOCKERHUB_PAT}"
+            export $(grep -v '^#' .env | xargs)
 
             echo "$DOCKERHUB_PASSWORD" | docker login --username "$DOCKERHUB_USERNAME" --password-stdin
 
-            export $(grep -v '^#' .env | xargs)
             docker compose pull
             docker compose up -d
           EOF
