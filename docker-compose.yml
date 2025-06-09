@@ -1,10 +1,16 @@
+networks:
+  web:
+    external: true
 services:
   arweave-api:
     image: "${IMAGE_NAME}:${IMAGE_TAG}"
     container_name: arweave-api
     env_file: .env
-    ports:
-      - '3000:3000'
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./.env:/app/.env
+    expose:
+      - 3000
+    labels:
+      - "autoregister=true"
+      - "traefik.http.routers.arweave-api.rule=Host(`arweave-api.iex.ec`)"
+    networks:
+      - web
+    restart: unless-stopped
