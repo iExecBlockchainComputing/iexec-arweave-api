@@ -22,9 +22,9 @@ jobs:
       username: ${{ secrets.DOCKERHUB_USERNAME }}
       password: ${{ secrets.DOCKERHUB_PAT }}
   deploy:
+    needs: [build]
     runs-on:
       group: Azure_runners
-      needs: [build]
 
     steps:
       - name: Checkout repository
