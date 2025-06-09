@@ -1,9 +1,6 @@
 services:
   arweave-api:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: arweave-api
+    image: arweave-api:$TAG
     container_name: arweave-api
     ports:
       - '3000:3000'

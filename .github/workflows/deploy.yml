@@ -48,6 +48,12 @@ jobs:
           chmod 644 ~/.ssh/known_hosts
         shell: bash
 
+      - name: Prepare .env for Compose
+        run: |
+          echo "IMAGE_NAME=${IMAGE_NAME}" > .env
+          echo "IMAGE_TAG=${IMAGE_TAG}" >> .env
+        shell: bash
+
       - name: Check for docker-compose.yml in workspace
         run: |
           if [ ! -f ./docker-compose.yml ]; then
@@ -70,6 +76,8 @@ jobs:
               -i ~/.ssh/ghrunnerci \
               azubdocxp-team-product.public.az2.internal << 'EOF'
             cd /opt/arweave-api
+
+            export $(grep -v '^#' .env | xargs)
             docker compose pull
             docker compose up -d
           EOF
