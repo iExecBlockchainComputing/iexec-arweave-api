@@ -82,6 +82,9 @@ jobs:
               azubdocxp-team-product.public.az2.internal << 'EOF'
             cd /opt/arweave-api
 
+            export DOCKERHUB_USERNAME="${DOCKERHUB_USERNAME}"
+            export DOCKERHUB_PAT="${DOCKERHUB_PAT}"
+
             echo "$DOCKERHUB_PASSWORD" | docker login --username "$DOCKERHUB_USERNAME" --password-stdin
 
             export $(grep -v '^#' .env | xargs)
