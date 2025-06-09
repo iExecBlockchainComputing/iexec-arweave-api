@@ -29,6 +29,8 @@ jobs:
     env:
       IMAGE_NAME: iexechub/arweave-api
       IMAGE_TAG: ${{ github.sha }}
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PAT }}
 
     steps:
       - name: Checkout repository
@@ -79,6 +81,8 @@ jobs:
               -i ~/.ssh/ghrunnerci \
               azubdocxp-team-product.public.az2.internal << 'EOF'
             cd /opt/arweave-api
+
+            echo "$DOCKERHUB_PASSWORD" | docker login --username "$DOCKERHUB_USERNAME" --password-stdin
 
             export $(grep -v '^#' .env | xargs)
             docker compose pull
