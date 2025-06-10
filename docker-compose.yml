@@ -6,6 +6,8 @@ services:
     image: "${IMAGE_NAME}:${IMAGE_TAG}"
     container_name: arweave-api
     env_file: .env
+    volumes:
+      - ./.env:/app/.env
     expose:
       - 3000
     labels:
