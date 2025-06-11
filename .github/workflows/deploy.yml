@@ -1,0 +1,108 @@
+name: Deploy Docker Container
+
+on:
+  push:
+    tags:
+      - '*'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  # Get Tag:
+  get-tag:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.get-tag.outputs.tag }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get tag
+        id: get-tag
+        run: echo "tag=$(echo ${GITHUB_REF#refs/tags/})" >> $GITHUB_OUTPUT
+  build:
+    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/docker-build.yml@docker-build-v2.2.0
+    needs: get-tag
+    with:
+      dockerfile: 'Dockerfile'
+      image-name: 'iexechub/arweave-api'
+      image-tag: ${{ needs.get-tag.outputs.tag }}
+      hadolint: false
+      security-scan: false
+      push: true
+    secrets:
+      username: ${{ secrets.DOCKERHUB_USERNAME }}
+      password: ${{ secrets.DOCKERHUB_PAT }}
+  deploy:
+    needs: [build, get-tag]
+    runs-on:
+      group: Azure_runners
+
+    env:
+      IMAGE_NAME: iexechub/arweave-api
+      IMAGE_TAG: ${{ needs.get-tag.outputs.tag }}
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PAT }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify SSH key exists on runner
+        run: |
+          if [ ! -f ~/.ssh/ghrunnerci ]; then
+            echo "SSH key not found at ~/.ssh/ghrunnerci on the runner"
+            exit 1
+          fi
+          chmod 600 ~/.ssh/ghrunnerci
+        shell: bash
+
+      - name: Add remote host to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan azubdocxp-team-product.public.az2.internal >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+        shell: bash
+
+      - name: Prepare .env for Compose
+        run: |
+          printf "IMAGE_NAME=%s\nIMAGE_TAG=%s\nDOCKERHUB_USERNAME=%s\nDOCKERHUB_PASSWORD=%s\n" "$IMAGE_NAME" "$IMAGE_TAG" "$DOCKERHUB_USERNAME" "$DOCKERHUB_PASSWORD"> .env
+        shell: bash
+
+      - name: Check for docker-compose.yml in workspace
+        run: |
+          if [ ! -f ./docker-compose.yml ]; then
+            echo "docker-compose.yml not found in the repository"
+            exit 1
+          fi
+        shell: bash
+
+      - name: Copy files to remote server
+        run: |
+          scp -o StrictHostKeyChecking=no \
+              -i ~/.ssh/ghrunnerci \
+              ./docker-compose.yml ./.env \
+              azubdocxp-team-product.public.az2.internal:/opt/arweave-api/
+        shell: bash
+
+      - name: Run Docker Compose on remote server
+        run: |
+          ssh -o StrictHostKeyChecking=no \
+              -i ~/.ssh/ghrunnerci \
+              azubdocxp-team-product.public.az2.internal << 'EOF'
+            cd /opt/arweave-api
+
+            export $(grep -v '^#' .env | xargs)
+
+            echo "$DOCKERHUB_PASSWORD" | docker login --username "$DOCKERHUB_USERNAME" --password-stdin
+
+            docker compose pull
+            docker compose up -d
+          EOF
+        shell: bash
