@@ -10,7 +10,7 @@ WORKDIR /app
 COPY package.json .
 COPY package-lock.json .
 
-RUN npm ci && \
+RUN npm ci --omit=dev && \
     rm -rf /var/cache/apk/*
 
 # Copy the rest of the application code
