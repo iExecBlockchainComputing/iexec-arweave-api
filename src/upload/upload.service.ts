@@ -16,8 +16,8 @@ export const handleFileUpload = async (buffer: Buffer): Promise<string> => {
     dataItemOpts: {
       tags: [
         {
-          name: "App-Name",
-          value: "iExec",
+          name: 'App-Name',
+          value: 'iExec',
         },
       ],
     },
