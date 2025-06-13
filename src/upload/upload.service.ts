@@ -13,6 +13,14 @@ export const handleFileUpload = async (buffer: Buffer): Promise<string> => {
   const uploadResult = await turbo.uploadFile({
     fileStreamFactory: () => Readable.from(buffer),
     fileSizeFactory: () => fileSize,
+    dataItemOpts: {
+      tags: [
+        {
+          name: 'App-Name',
+          value: 'iExec',
+        },
+      ],
+    },
     signal: AbortSignal.timeout(15_000),
   });
 
