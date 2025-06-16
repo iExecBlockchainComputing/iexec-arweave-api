@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/iExecBlockchainComputing/iexec-arweave-api/compare/v1.0.0...v1.1.0) (2025-06-16)
+
+
+### 🚀 Features
+
+* add transaction tag ([#13](https://github.com/iExecBlockchainComputing/iexec-arweave-api/issues/13)) ([2feeb1b](https://github.com/iExecBlockchainComputing/iexec-arweave-api/commit/2feeb1b674161e3c6d06b18df075fea037c31d10))
+
 ## [1.0.0](https://github.com/iExecBlockchainComputing/iexec-arweave-api/compare/v1.0.0...v1.0.0) (2025-06-11)
 
 
